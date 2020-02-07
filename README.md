@@ -10,6 +10,8 @@ The collection can be imported using the steps found here: https://learning.post
 
 The environment can be imported by clicking the gear at the top right of Postman, then clicking the import button on the window that opens.
 
+The collection can be run with the requests in order.  The shutdown request will also reset the request_count variable if it receives a 200
+
 ## Environment Variables
 port - Allows you to change the port that you are running the HashServe on
 
