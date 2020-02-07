@@ -146,7 +146,7 @@
 						"id": "8c80386b-a5ea-4b89-99a2-365e33f431ff",
 						"exec": [
 							"/*\r",
-							" * Found at http://approsto.com/shq-generator/\r",
+							" * Found at http://approsto.com/sha-generator/\r",
 							" * A JavaScript implementation of the Secure Hash Algorithm, SHA-512, as defined\r",
 							" * in FIPS 180-2\r",
 							" * Version 2.2 Copyright Anonymous Contributor, Paul Johnston 2000 - 2009.\r",
