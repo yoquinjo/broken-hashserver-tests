@@ -776,9 +776,8 @@
 					"script": {
 						"id": "e41e78fa-6abb-4a3f-a52c-94a9b3a95a67",
 						"exec": [
-							"tests[\"Status is 200\"] = pm.response.to.have.status(200);",
-							"tests[\"Response is OK\"] = pm.response.to.be.ok;",
-							"tests[\"Body is empty\"] = pm.response.to.have.body(\"\");"
+							"tests[\"Status is 400\"] = pm.response.to.have.status(400);",
+							"tests[\"Body says Malformed Input\"] = pm.response.to.have.body(\"Malformed Input\\n\");"
 						],
 						"type": "text/javascript"
 					}
@@ -795,7 +794,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "shutdown"
+					"raw": "nonsense"
 				},
 				"url": {
 					"raw": "{{url}}:{{port}}/hash",
@@ -820,7 +819,8 @@
 						"exec": [
 							"tests[\"Status is 200\"] = pm.response.to.have.status(200);",
 							"tests[\"Response is OK\"] = pm.response.to.be.ok;",
-							"tests[\"Body is empty\"] = pm.response.to.have.body(\"\");"
+							"tests[\"Body is empty\"] = pm.response.to.have.body(\"\");",
+							"pm.environment.set(\"request_count\", 0);"
 						],
 						"type": "text/javascript"
 					}
