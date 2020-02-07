@@ -1,0 +1,19 @@
+-Description-
+After sending multiple requests, average time in stats always displays 0.  Typical total time shown in Postman for me was ~5000 ms, download time was ~4.35 ms
+
+-Found in Version-
+0c3d817
+
+-Found By-
+Jon Yoquinto
+
+-Steps to Reproduce-
+1. Have the hash server running.
+2. POST to the hash endpoint a few times, noting the total time it takes for the request to process(postman gives a breakdown for each step)
+3. GET the stats page and view the average time
+
+--Expected Results:
+AverageTime is a number greater than 0
+
+--Actual Results:
+AverageTime is always 0, no matter how many requests have been sent

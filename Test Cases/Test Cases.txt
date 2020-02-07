@@ -1,0 +1,213 @@
+---Test Case 1---
+Application waits for http response
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 8088
+
+--Steps--
+1. Send any request(except shutdown) to a valid endpoint (http://127.0.0.1:8088/hash, http://127.0.0.1:8088/stats)
+
+-Expected Result
+Status code of 200 or 400
+
+--------------------------------------------------------------------------------------------------------------------
+---Test Case 2---
+Application runs on port set in Environment variable
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 443
+
+--Steps--
+1. Send any request(except shutdown) to a valid endpoint (http://127.0.0.1:443/hash, http://127.0.0.1:443/stats)
+
+-Expected Result
+Status code of 200 or 400
+
+--------------------------------------------------------------------------------------------------------------------
+---Test Case 3---
+POST to /hash accepts a password and returns the job identifier
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 8088
+
+--Steps--
+1. Send a POST request to http://127.0.0.1:8088/hash with a password (angrymonkey) in the body
+
+-Expected Result
+Status code of 200
+Response is json
+Response returns the job id (incrementing number that begins at 0 from server start)
+
+--------------------------------------------------------------------------------------------------------------------
+---Test Case 4---
+GET to /hash/{{jobid}} returns base64 encoded password
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 8088
+
+--Steps--
+1. Send a POST request to http://127.0.0.1:8088/hash with a password (angrymonkey) in the body
+2. Note the job id returned from the POST request
+3. Send a GET request to http://127.0.0.1:8088/hash/{{jobid from step 1}}
+
+-Expected Result
+Status code of 200
+Response returns the base64 encoded password
+
+--------------------------------------------------------------------------------------------------------------------
+---Test Case 5---
+GET to /hash/{{Nonexisting jobid}} returns Hash not found
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 8088
+
+--Steps--
+1. Send a GET request to http://127.0.0.1:8088/hash/0
+
+-Expected Result
+Status code of 400
+Response returns "Hash not found"
+
+--------------------------------------------------------------------------------------------------------------------
+---Test Case 6---
+Password is correctly encoded by server
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 8088
+-Alternative SHA256 base64 encoder
+
+--Steps--
+1. Send a POST request to http://127.0.0.1:8088/hash with a password (angrymonkey) in the body
+2. Note the job id returned from the POST request
+3. Send a GET request to http://127.0.0.1:8088/hash/{{jobid from step 1}}
+4. Put the password from step one into an alternative SHA256 base64 encoder and compare with what was returned in step 3
+
+-Expected Result
+Hashes match
+
+--------------------------------------------------------------------------------------------------------------------
+---Test Case 7---
+Stats correctly keeps track of how many requests there were
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 8088
+
+--Steps--
+1. Send multiple POST requests to http://127.0.0.1:8088/hash with a passwords in the body (Remember how many requests you sent)
+2. Send a GET request to http://127.0.0.1:8088/stats
+3. Compare the number of requests returned with the requests you sent
+
+-Expected Result
+TotalRequests match number of requests sent
+
+--------------------------------------------------------------------------------------------------------------------
+---Test Case 8---
+Stats correctly keeps track average request time
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 8088
+
+--Steps--
+1. Send multiple POST requests to http://127.0.0.1:8088/hash with a passwords in the body (Remember how many requests you sent)
+2. Send a GET request to http://127.0.0.1:8088/stats
+3. Look at AverageTime
+
+-Expected Result
+AverageTime should be greater than 0 and within a reasonable range based on how long requests took in milliseconds
+
+--------------------------------------------------------------------------------------------------------------------
+---Test Case 9---
+Incorrect command returns "Malformed Input"
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 8088
+
+--Steps--
+1. Send a POST request to http://127.0.0.1:8088/hash with nonsense in the body
+
+-Expected Result
+Status code of 400
+Returns "Malformed Input"
+
+--------------------------------------------------------------------------------------------------------------------
+---Test Case 10---
+Shutdown command shuts down the server
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 8088
+
+--Steps--
+1. Send a POST request to http://127.0.0.1:8088/hash with shutdown in the body
+2. Check the system that was running the Hash Serve
+
+-Expected Result
+Status code of 200
+Empty body
+Hash Serve is no longer running on the host machine
+
+--------------------------------------------------------------------------------------------------------------------
+---Test Case 11---
+Software allows simultaneous connections
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 8088
+-Have multiple clients that can connect to Hash Serve (I used a curl and postman)
+
+--Steps--
+1. Prepare both clients for a simultaneous connection with a POST request to http://127.0.0.1:8088/hash with a password in the body
+2. Send both commands from the clients as close to simultaneously as possible
+
+-Expected Result
+Status code of 200 for both requests
+Each request receives its jobid
+
+--------------------------------------------------------------------------------------------------------------------
+---Test Case 12---
+Shutdown waits for running commands to finish before shutting down the Hash Serve
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 8088
+-Have multiple clients that can connect to Hash Serve (I used a curl and postman)
+
+--Steps--
+1. Send a POST request to http://127.0.0.1:8088/hash with a password in the body from one client
+2. Quickly issue a POST request to http://127.0.0.1:8088/hash with shutdown in the body in another client
+
+-Expected Result
+Status code of 200 for both requests
+First request receives its jobid
+Hash Serve is no longer running on the host machine
+
+--------------------------------------------------------------------------------------------------------------------
+---Test Case 13---
+Shutdown prevents new password requests from being processed
+
+--PreReqs--
+-Hash Serve running on http://127.0.0.1
+-Port Environment variable set to 8088
+-Have multiple clients that can connect to Hash Serve (I used 2 curl clients and postman)
+
+--Steps--
+1. Send a POST request to http://127.0.0.1:8088/hash with a password in the body from one client
+2. Quickly issue a POST request to http://127.0.0.1:8088/hash with shutdown in the body in another client
+3. Quickly issue a POST request to http://127.0.0.1:8088/hash with a password in the body from a third client
+
+-Expected Result
+Status code of 200 for the first 2 requests
+First request receives its jobid
+Third request receieves "Service Unavailable"
+Hash Serve is no longer running on the host machine
+
+--------------------------------------------------------------------------------------------------------------------
